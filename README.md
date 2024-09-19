@@ -32,7 +32,7 @@ This approach generates both types of parameters so that traditional psychometri
 - Signal Detection Theory (SDT) analysis integration
 - Parallel parameter estimation for improved performance
 - Visualization tools for parameter convergence and item characteristic curves
-- Flexible data input and output formats
+- Can handle sparse data and/or continuous data
 - Applicable to various types of questions and response data, not limited to mathematical problems
 
 ## Installation
