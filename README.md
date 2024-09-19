@@ -3,6 +3,7 @@
 PyIRT_SDT is a comprehensive Python library for Item Response Theory (IRT) and Signal Detection Theory (SDT) estimation and analysis. It provides robust tools for modeling and analyzing participant response data using advanced psychometric techniques.
 
 NOTE: This library is not designed for memory efficiency because it was used on large memory machines.
+This library was primarily developed to be used as input parameters (in addition to primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions.
 
 ## Features
 

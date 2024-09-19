@@ -604,4 +604,45 @@ def correlationOfParametersByPerformance(solvedIRT, exclusion_percentage=10):
     indx = ~np.isnan(solvedIRT.est_params[0])
     print('Correlation:', np.corrcoef(solvedIRT.est_params[0][indx], solvedIRT.student_correct[indx])[0][1])
 
-def compareRuns(A, B
+def compareRuns(A,B):
+    #inputs two solvedIRT objects; outputs correlation between them
+    At = A.thetas
+    Bt = B.thetas
+
+    plt.hist(A.thetas,bins=100)
+    plt.hist(B.thetas,bins=100)
+    plt.title('distribution of thetas')
+    plt.show()
+    print('theta parameter correl: ', np.corrcoef(At[~np.isnan(At)],Bt[~np.isnan(At)])[0][1])
+
+    Ae = A.est_params[0]
+    Be = B.est_params[0]
+    print('discriminability parameter correl: ', np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+
+    Ae = A.est_params[1]
+    Be = B.est_params[1]
+    print('difficulty parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+
+    Ae = A.est_params[2]
+    Be = B.est_params[2]
+    print('guessing parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+
+    Ae = A.est_params[3]
+    Be = B.est_params[3]
+    print('atttention parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+
+    Ae = A.auc_roc
+    Be = B.auc_roc
+    print('auc_roc parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+
+    Ae = A.optimal_threshold
+    Be = B.optimal_threshold
+    print('optimal_threshold parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+    
+    Ae = A.tpr
+    Be = B.tpr
+    print('tpr parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
+
+    Ae = A.tnr
+    Be = B.tnr
+    print('tnr parameter correl: ',np.corrcoef(Ae[~np.isnan(Ae)],Be[~np.isnan(Ae)])[0][1])
