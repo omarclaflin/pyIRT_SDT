@@ -55,10 +55,73 @@ def returnTable(df, roundValues=True):
     
     return table
 
+# Model Output
+
+class IRTResults:
+    def __init__(self, table, all_thetas, all_est_params, all_delta_thetas, history_arrays, sdt_results):
+        self.question_ids = table.columns
+        self.thetas = all_thetas
+        self.est_params = all_est_params
+        self.delta_thetas = all_delta_thetas
+        
+        self.item_power = np.sum(table.notna(), axis=0)  # num students in each item
+        self.student_power = np.sum(table.notna(), axis=1)  # num items for this theta
+        self.student_correct = np.nansum(table, axis=0) / self.item_power  # % correct across all students
+        self.item_correct = np.nansum(table, axis=1) / self.student_power  # % correct across all items
+        
+        # Assuming est_delta_confidence is calculated elsewhere and passed in history_arrays
+        self.est_delta_confidence = history_arrays['theta_confidence_hx'][-1]
+        
+        # History arrays
+        self.delta_thetas_hx = history_arrays['student_delta_thetas_hx']
+        self.student_thetas_hx = history_arrays['student_thetas_hx']
+        self.discriminability_hx = history_arrays['discriminability_hx']
+        self.difficulty_hx = history_arrays['difficulty_hx']
+        self.guessing_hx = history_arrays['guessing_hx']
+        self.attention_hx = history_arrays['attention_hx']
+        self.item_confidence_hx = history_arrays['item_confidence_hx']
+        self.item_power_hx = history_arrays['item_power_hx']
+        self.theta_confidence_hx = history_arrays['theta_confidence_hx']
+        self.theta_power_hx = history_arrays['theta_power_hx']
+        
+        # Error history arrays
+        self.discriminability_error_hx = history_arrays['discriminability_error_hx']
+        self.difficulty_error_hx = history_arrays['difficulty_error_hx']
+        self.guessing_error_hx = history_arrays['guessing_error_hx']
+        self.attention_error_hx = history_arrays['attention_error_hx']
+        
+        # SDT results
+        self.auc_roc = sdt_results['auc_roc']
+        self.optimal_threshold = sdt_results['optimal_threshold']
+        self.tpr = sdt_results['tpr']
+        self.tnr = sdt_results['tnr']
+        
+        self.sample_size = self.item_power
+
+    def __str__(self):
+        return f"IRTResults for {len(self.question_ids)} items and {len(self.thetas)} participants"
+
+    def __repr__(self):
+        return self.__str__()
+
+    # add more methods later
+    def get_item_parameters(self, item_index):
+        """Return the IRT parameters for a specific item."""
+        return {
+            'discriminability': self.est_params[0][item_index],
+            'difficulty': self.est_params[1][item_index],
+            'guessing': self.est_params[2][item_index],
+            'attention': self.est_params[3][item_index] if len(self.est_params) > 3 else None
+        }
+
+    def get_participant_ability(self, participant_index):
+        """Return the estimated ability (theta) for a specific participant."""
+        return self.thetas[participant_index]
+
 # Model Estimation
 def parallel_estimate_parameters(table, thetas, PLOT_ON=True, FOUR_PL=True, est_kernel='trf', parallel=True, bounds=None):
     """
-    Estimate IRT parameters for all items in parallel.
+    Estimate IRT parameters for all items, with option for parallel processing.
     
     Args:
         table (pd.DataFrame): Pivot table of participant responses.
@@ -85,22 +148,40 @@ def parallel_estimate_parameters(table, thetas, PLOT_ON=True, FOUR_PL=True, est_
         
         if len(item_series) > MINIMUM_DATA_POINTS:
             try:
-                popt, pcov = curve_fit(model, item_thetas, item_series[item], bounds=bounds, method='trf')
+                try:
+                    popt, pcov = curve_fit(model, item_thetas, item_series[item], bounds=bounds, method='trf')
+                except:
+                    popt, pcov = curve_fit(model, item_thetas, item_series[item], bounds=bounds, method='dogbox')
+                
                 if PLOT_ON:
-                    plot_item_fit(item, item_thetas, item_series[item], model, popt)
+                    import matplotlib.pyplot as plt
+                    plt.figure(figsize=(10, 6))
+                    plt.title(f'Item {item}')
+                    plt.scatter(item_thetas, item_series[item])
+                    theta_range = np.linspace(min(item_thetas), max(item_thetas), 100)
+                    plt.plot(theta_range, model(theta_range, *popt))
+                    plt.xlabel('Theta')
+                    plt.ylabel('Response')
+                    plt.show()
+                    print(f'a: {popt[0]:.4f}, b: {popt[1]:.4f}, c: {popt[2]:.4f}')
+                    if FOUR_PL:
+                        print(f'd: {popt[3]:.4f}')
                 
                 return (*popt, np.sqrt(np.diag(pcov)))
-            except RuntimeError:
-                print(f"Fitting failed for item {item}")
+            except Exception as e:
+                print(f"Fitting failed for item {item}: {str(e)}")
         
         return tuple([np.nan] * (5 if FOUR_PL else 4))
 
-    job_function = delayed(process_item)
-    results = Parallel(n_jobs=-1 if parallel else 1)(job_function(i) for i in range(num_items))
+    if parallel:
+        from joblib import Parallel, delayed
+        results = Parallel(n_jobs=-1)(delayed(process_item)(i) for i in range(num_items))
+    else:
+        results = [process_item(i) for i in range(num_items)]
     
-    return tuple(np.array([r[i] for r in results]) for i in range(5 if FOUR_PL else 4))
+    return tuple(np.array([r[i] for r in results if r is not None]) for i in range(5 if FOUR_PL else 4))
 
-def solve_IRT_for_matrix(table, all_thetas=None, iterations=50, FOUR_PL=True, show_convergence=10, show_discriminability=0, bounds=None, verbose=False):
+def solve_IRT_for_matrix(table, all_thetas=None, iterations=50, FOUR_PL=True, show_convergence=None, show_discriminability=None, bounds=None, parallel=True, verbose=False, PLOT_ON=False):
     """
     Solve IRT model for a given response matrix.
     
@@ -113,6 +194,7 @@ def solve_IRT_for_matrix(table, all_thetas=None, iterations=50, FOUR_PL=True, sh
         show_discriminability (int): Frequency of discriminability plots. Defaults to 0.
         bounds (tuple): Bounds for parameter estimation. Defaults to None.
         verbose (bool): Whether to print verbose output. Defaults to False.
+        PLOT_ON (bool): Whether to output raw data and thetas on first and last run. Defaults to False.
     
     Returns:
         IRTResults: Object containing estimated parameters and other results.
@@ -127,8 +209,8 @@ def solve_IRT_for_matrix(table, all_thetas=None, iterations=50, FOUR_PL=True, sh
         if show_convergence > 0 and iter_num % show_convergence == 0:
             print(f"Iteration #{iter_num}")
 
-        all_est_params = parallel_estimate_parameters(table, all_thetas, 
-                                                      PLOT_ON=(iter_num == 0 or iter_num == iterations - 1),
+        all_est_params = parallel_estimate_parameters(table, all_thetas, parallel=parallel,
+                                                      PLOT_ON=(PLOT_ON and (iter_num == 0 or iter_num == iterations - 1)) or False,
                                                       FOUR_PL=FOUR_PL, bounds=bounds)
 
         update_history_arrays(history_arrays, all_est_params, all_thetas, iter_num)
@@ -145,8 +227,12 @@ def solve_IRT_for_matrix(table, all_thetas=None, iterations=50, FOUR_PL=True, sh
             print('Inverting theta/beta spectrum')
             all_thetas *= -1
 
-        plot_convergence(all_delta_thetas, iter_num, show_convergence)
-        plot_discriminability(all_est_params[0], iter_num, show_discriminability)
+        if show_convergence != None:
+            if iter_num % show_convergence ==0::
+                plot_convergence(all_delta_thetas, iter_num, show_convergence)
+        if show_discriminability != None:
+            if iter_num % show_discriminability ==0:
+                plot_discriminability(all_est_params[0], iter_num, show_discriminability)
 
     sdt_results = calculate_sdt_results(table, all_thetas, all_est_params, FOUR_PL, verbose)
 
