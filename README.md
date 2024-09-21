@@ -56,8 +56,20 @@ Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the 
 ```!pip install PyIRT_SDT```
 ```table = pyirt_sdt.returnTable(skill_data)```
 ```results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)```
+```df = export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
 
-results.
+Writes out a csv (set no_csv_export=False to turn this off) and returns a pandas dataframe (df) that contains:
+
+  All estimated IRT parameters and SDT parameters that are found in the results object. Additionally, aggregate performance data across students and items are included.
+  
+  ```results.question_ids                   # item label found in table.columns```
+  
+    --IRT estimated parameters--
+  ```results.thetas = all_thetas            # estimated abilities of all students```
+  ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
+            
+    --SDT estimated parameters--
+  ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
 
 ## Installation
 
