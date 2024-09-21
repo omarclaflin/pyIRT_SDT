@@ -112,23 +112,21 @@ table = pyirt_sdt.returnTable(skill_data)
 # Returns an object containing IRT and SDT estimated parameters. 
 results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)
 # Returns a pandas dataframe of the results. Optionally, writes out a csv (set no_csv_export=False to turn this off). 
-df = pyirt_sdt.export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
+df = pyirt_sdt.export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')
+```
 
-
-  Some examples of the estimated IRT parameters and SDT parameters found in the results object (and dataframe). In addition to below, aggregate performance data across students and items are also included.
+'''
+# Some examples of the estimated IRT parameters and SDT parameters found in the results object (and dataframe). In addition to below, aggregate performance data across students and items are also included.  
+results.question_ids                   # item label found in table.columns
   
-  ```results.question_ids                   # item label found in table.columns```
+# IRT estimated parameters 
   
-  '''# IRT estimated parameters '''
-  
-  ```results.thetas = all_thetas            # estimated abilities of all students```
+results.thetas = all_thetas            # estimated abilities of all students```
 
-  ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
-
+results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter 
             
-  '''# SDT estimated parameters '''
-  
-  ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
+  '''# SDT estimated parameters 
+  results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
 
 
   Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
