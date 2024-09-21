@@ -4,7 +4,39 @@ PyIRT_SDT is a comprehensive Python library for Item Response Theory (IRT) and S
 
 NOTE: This library was not designed with memory efficiency in mind because it was developed on large memory instances.
 
-MOTIVATION: At the time when I developed this, there was no Python IRT library that could (1) handle sparse data, and (2) run on my system without errors. 
+
+## To use in jupyter notebooks
+
+```!pip install PyIRT_SDT```
+
+```table = pyirt_sdt.returnTable(skill_data)```
+
+```results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)```
+
+```df = export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
+
+
+Writes out a csv (set no_csv_export=False to turn this off) and returns a pandas dataframe (df) that contains:
+
+  All estimated IRT parameters and SDT parameters that are found in the results object. Additionally, aggregate performance data across students and items are included.
+  
+  ```results.question_ids                   # item label found in table.columns```
+  
+    --IRT estimated parameters--
+  ```results.thetas = all_thetas            # estimated abilities of all students```
+
+  ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
+
+            
+    --SDT estimated parameters--
+  ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
+
+
+  Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
+
+  
+## Motivation: ## 
+At the time when I developed this, there was no Python IRT library that could (1) handle sparse data, and (2) run on my system without errors. 
 This library was primarily developed to generate IRT parameters from student performance data, to be used as input parameters (in addition to other primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include more engineered features (SDT parameters, modelling error, etc), as well, as some validation tools to confirm our approach.
 
 # Approach/Method: 
@@ -48,28 +80,6 @@ Validation Approaches (using data and the tools in this package; not pedagogical
 - Visualization tools for parameter convergence, item characteristic curves, and other analyses
 - Can handle sparse data and/or continuous data (including for SDT parameters)
 - Applicable to various types of questions and response data, not limited to educational psychometric problems
-
-## To use in jupyter notebooks
-
-Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
-
-```!pip install PyIRT_SDT```
-```table = pyirt_sdt.returnTable(skill_data)```
-```results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)```
-```df = export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
-
-Writes out a csv (set no_csv_export=False to turn this off) and returns a pandas dataframe (df) that contains:
-
-  All estimated IRT parameters and SDT parameters that are found in the results object. Additionally, aggregate performance data across students and items are included.
-  
-  ```results.question_ids                   # item label found in table.columns```
-  
-    --IRT estimated parameters--
-  ```results.thetas = all_thetas            # estimated abilities of all students```
-  ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
-            
-    --SDT estimated parameters--
-  ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
 
 ## Installation
 
