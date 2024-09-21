@@ -9,16 +9,22 @@ NOTE: This library was not designed with memory efficiency in mind because it wa
 
 ```!pip install PyIRT_SDT```
 
+```import PyIRT_SDT as pyirt_sdt```
+
+```#Returns tabular data from an array of performance data ['participant_id', 'item_id', 'response'] ```
+
 ```table = pyirt_sdt.returnTable(skill_data)```
+
+```#Returns an object containing IRT and SDT estimated parameters. ```
 
 ```results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)```
 
-```df = export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
+```#Returns a pandas dataframe of the results. Optionally, writes out a csv (set no_csv_export=False to turn this off). ```
+
+```df = pyirt_sdt.export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
 
 
-Writes out a csv (set no_csv_export=False to turn this off) and returns a pandas dataframe (df) that contains:
-
-  All estimated IRT parameters and SDT parameters that are found in the results object. Additionally, aggregate performance data across students and items are included.
+  Some examples of the estimated IRT parameters and SDT parameters found in the results object (and dataframe). In addition to below, aggregate performance data across students and items are also included.
   
   ```results.question_ids                   # item label found in table.columns```
   
