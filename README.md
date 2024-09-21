@@ -5,7 +5,7 @@ PyIRT_SDT is a comprehensive Python library for Item Response Theory (IRT) and S
 NOTE: This library was not designed with memory efficiency in mind because it was developed on large memory instances.
 
 MOTIVATION: At the time when I developed this, there was no Python IRT library that could (1) handle sparse data, and (2) run on my system without errors. 
-This library was primarily developed to be used as input parameters (in addition to primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include SDT, as well, as some validation tools.
+This library was primarily developed to be used as input parameters (in addition to primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include more engineered features (SDT parameters, modelling error, etc), as well, as some validation tools to confirm our approach.
 
 # METHOD: 
 
