@@ -146,19 +146,6 @@ Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the 
 
 For detailed documentation, please refer to the [docs](docs/) directory or visit our [Read the Docs](https://pyirt-sdt.readthedocs.io/) page.
 
-## Command-line Interface
-
-PyIRT_SDT provides a command-line interface for quick analysis:
-
-```bash
-pyirt-sdt analyze --input your_data.csv --output results.csv --model 4pl
-```
-
-For more options, run:
-
-```bash
-pyirt-sdt --help
-```
 
 ## Contributing
 
