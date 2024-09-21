@@ -28,13 +28,15 @@ NOTE: This library was not designed with memory efficiency in mind because it wa
   
   ```results.question_ids                   # item label found in table.columns```
   
-    --IRT estimated parameters--
+  '''# IRT estimated parameters '''
+  
   ```results.thetas = all_thetas            # estimated abilities of all students```
 
   ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
 
             
-    --SDT estimated parameters--
+  '''# SDT estimated parameters '''
+  
   ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
 
 
