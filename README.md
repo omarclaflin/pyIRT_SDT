@@ -9,12 +9,12 @@ This library was primarily developed to be used as input parameters (in addition
 
 # METHOD: 
 
-IRT
+**IRT**
 
 First, all IRT parameters are calculated (default uses a 4PL, but a 3PL is available) using scipy.optimize.curve_fit() (refer to scipy.optimize.least_squares for how the Jacobian is computed and solved) via an iterative process which seeks to maximize the fit over all items, for all participants, within the skill.
-All IRT parameters and IRT model error variables (independent for each parameter within the 3PL or 4PL model) are captured once convergence or iteration cycles are reached. Default is a 4PL which fits a logistic curve using 4 parameters: discriminability, difficulty, guessing level, inattention level.
+All IRT parameters and IRT model error variables (independent for each parameter within the 3PL or 4PL model) are captured once convergence or iteration cycles are reached. Default is a 4PL which fits a logistic curve using 4 parameters: discriminability, difficulty, guessing level, inattention level. For comprehensiveness, total modelling fit error is captured for each item, along with modelling error associated with each parameter.
 
-SDT
+**SDT**
 
 Secondly, Signal Detection Theory (SDT) parameters are computed from the estimated participant thetas (estimated participant ability from IRT) and raw performance, including: Area Under Curve of Receiving Operating Characteristic (AUC_ROC), TPR, TNR, and Optimal Threshold (optimal criterion maximizing TNR and TPR). 
 
@@ -48,6 +48,11 @@ Validation Approaches (using data and the tools in this package; not pedagogical
 - Visualization tools for parameter convergence and item characteristic curves
 - Can handle sparse data and/or continuous data
 - Applicable to various types of questions and response data, not limited to mathematical problems
+
+## To use in jupyter notebooks
+
+!pip install PyIRT_SDT
+Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
 
 ## Installation
 
