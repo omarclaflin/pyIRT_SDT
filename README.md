@@ -5,9 +5,9 @@ PyIRT_SDT is a comprehensive Python library for Item Response Theory (IRT) and S
 NOTE: This library was not designed with memory efficiency in mind because it was developed on large memory instances.
 
 MOTIVATION: At the time when I developed this, there was no Python IRT library that could (1) handle sparse data, and (2) run on my system without errors. 
-This library was primarily developed to be used as input parameters (in addition to primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include more engineered features (SDT parameters, modelling error, etc), as well, as some validation tools to confirm our approach.
+This library was primarily developed to generate IRT parameters from student performance data, to be used as input parameters (in addition to other primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include more engineered features (SDT parameters, modelling error, etc), as well, as some validation tools to confirm our approach.
 
-# METHOD: 
+# Approach/Method: 
 
 **IRT**
 
@@ -16,7 +16,7 @@ All IRT parameters and IRT model error variables (independent for each parameter
 
 **SDT**
 
-Secondly, Signal Detection Theory (SDT) parameters are computed from the estimated participant thetas (estimated participant ability from IRT) and raw performance, including: Area Under Curve of Receiving Operating Characteristic (AUC_ROC), TPR, TNR, and Optimal Threshold (optimal criterion maximizing TNR and TPR). 
+Secondly, Signal Detection Theory (SDT) parameters are computed from the estimated participant thetas (estimated participant ability from IRT) and raw performance, including: Area Under Curve of Receiving Operating Characteristic (AUC_ROC), TPR, TNR, and Optimal Threshold (the criterion on the x-axis of the ROC curve that maximizes TNR and TPR). 
 
 Note: We don't use IRT parameters to calculate the SDT parameters; only the estimated student abilties from the IRT process. With SDT, we are asking: *How well does each question do in separating lower ability students from higher ability students?* We answer that quantitatively with traditional SDT parameters, such as True Positive Rate, AUC, and Optimal Threshold (optimal criterion).
 
@@ -45,14 +45,19 @@ Validation Approaches (using data and the tools in this package; not pedagogical
 - Support for 3PL and 4PL IRT models
 - Signal Detection Theory (SDT) analysis integration
 - Parallel parameter estimation for improved performance
-- Visualization tools for parameter convergence and item characteristic curves
-- Can handle sparse data and/or continuous data
-- Applicable to various types of questions and response data, not limited to mathematical problems
+- Visualization tools for parameter convergence, item characteristic curves, and other analyses
+- Can handle sparse data and/or continuous data (including for SDT parameters)
+- Applicable to various types of questions and response data, not limited to educational psychometric problems
 
 ## To use in jupyter notebooks
 
-!pip install PyIRT_SDT
 Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
+
+```!pip install PyIRT_SDT```
+```table = pyirt_sdt.returnTable(skill_data)```
+```results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)```
+
+results.
 
 ## Installation
 
