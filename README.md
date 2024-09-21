@@ -2,29 +2,43 @@
 
 PyIRT_SDT is a comprehensive Python library for Item Response Theory (IRT) and Signal Detection Theory (SDT) estimation and analysis. It provides robust tools for modeling and analyzing participant response data using advanced psychometric techniques.
 
-NOTE: This library is not designed for memory efficiency because it was used on large memory machines.
+NOTE: This library was not designed with memory efficiency in mind because it was developed on large memory instances.
 
 MOTIVATION: At the time when I developed this, there was no Python IRT library that could (1) handle sparse data, and (2) run on my system without errors. 
-This library was primarily developed to be used as input parameters (in addition to primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions.
+This library was primarily developed to be used as input parameters (in addition to primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include SDT, as well, as some validation tools.
 
-METHOD: 
-# IRT
+# METHOD: 
+
+IRT
+
 First, all IRT parameters are calculated (default uses a 4PL, but a 3PL is available) using scipy.optimize.curve_fit() (refer to scipy.optimize.least_squares for how the Jacobian is computed and solved) via an iterative process which seeks to maximize the fit over all items, for all participants, within the skill.
-All IRT parameters and IRT model error variables (independent for each parameter within the 3PL or 4PL model) are captured once convergence or iteration cycles are reached. 4PL fits a logistic curve using 4 parameters: discriminability, difficulty, guessing level, inattention level.
+All IRT parameters and IRT model error variables (independent for each parameter within the 3PL or 4PL model) are captured once convergence or iteration cycles are reached. Default is a 4PL which fits a logistic curve using 4 parameters: discriminability, difficulty, guessing level, inattention level.
 
-# SDT
-Finally, Signal Detection Theory (SDT) parameters are computed from the estimated participant thetas (estimated participant ability) and raw performance, including: Area Under Curve of Receiving Operating Characteristic (AUC_ROC), TPR, TNR, and Optimal Threshold (optimal criterion maximizing TNR and TPR). 
+SDT
 
-Note: We don't use IRT parameters to calculate the SDT parameters; only the estimated student abilties from the IRT process. With SDT, we are asking: How well does each question do in separating lower ability students from higher ability students? We answer that quantitatively with traditional SDT parameters, such as True Positive Rate, AUC, and Optimal Threshold (optimal criterion).
+Secondly, Signal Detection Theory (SDT) parameters are computed from the estimated participant thetas (estimated participant ability from IRT) and raw performance, including: Area Under Curve of Receiving Operating Characteristic (AUC_ROC), TPR, TNR, and Optimal Threshold (optimal criterion maximizing TNR and TPR). 
 
-From my experience, AUC_ROC can be used as a SDT substitute for IRT Discirminability. 1 - Optimal Threshold can be used as a SDT substitute for IRT Difficulty. 
+Note: We don't use IRT parameters to calculate the SDT parameters; only the estimated student abilties from the IRT process. With SDT, we are asking: *How well does each question do in separating lower ability students from higher ability students?* We answer that quantitatively with traditional SDT parameters, such as True Positive Rate, AUC, and Optimal Threshold (optimal criterion).
+
+From my experience: 
+1) AUC_ROC can be used as a SDT substitute for IRT Discirminability. 
+2) 1 - Optimal Threshold can be used as a SDT substitute for IRT Difficulty. 
+3) Optimal Threshold, TPR, TNR seem to provide the most predictability in models trying to predict future student performance, over IRT parameters, from the large datasets I've worked on.
 
 Several benefits of SDT include:
 1) A normalized range (0 to 1) for difficulty making across skill comparisons easier and more intrepretable, for content teams.
 2) More accurate when using these (instead of IRT parameters) to predict future performance inside of models.
-3) Values more in line with ML approaches, making them intrepretable to MLEs and other users familiar with SDT.
+3) Values more in line with ML approaches, making them intrepretable to MLEs, engineers, and other users familiar with SDT.
+4) Note, we still rely on the logistical modelling of IRT to sort the students. In the future, we can add 2PL, 1PL models as well.
 
 This approach generates both types of parameters so that traditional psychometric teams have access to familiar parameters, while servicing SDT parameters for ML teams.
+
+Validation Approaches (using data and the tools in this package; not pedagogical validity):
+1) Convergence plots are available to view. Delta thetas (after each iterative run) -- we expect this to shrink over time.
+2) Eyeball visualization of raw performance data against modelled IRT curve, for each item.
+3) Information plots for each item, and the entire skill/test (traditionally, an "ICC"), along with a distribution of student theta plot.
+4) Correlation plots that show a strong but not overwhelming relationship between student performance and their estimated thetas, aggregate performance on that item versus its estimated "beta" (estimated item IRT difficulty, SDT optimal threshold).
+5) The lack of strong correlations (independence) of discriminabilty, auc_roc with aggregate_performance and item_mean_correct patterns.
 
 ## Features
 
