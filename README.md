@@ -4,45 +4,42 @@ PyIRT_SDT is a comprehensive Python library for Item Response Theory (IRT) and S
 
 NOTE: This library was not designed with memory efficiency in mind because it was developed on large memory instances.
 
+## Quick Start
 
-## To use in jupyter notebooks
+Here's a simple example of how to use PyIRT_SDT:
 
-```!pip install PyIRT_SDT```
+```python
+import pandas as pd
+from pyirt_sdt import returnTable, solve_IRT_for_matrix
 
-```import PyIRT_SDT as pyirt_sdt```
+# Load your data
+df = pd.read_csv('your_data.csv')
 
-```#Returns tabular data from an array of performance data ['participant_id', 'item_id', 'response'] ```
+# Prepare the data
+table = returnTable(df)
 
-```table = pyirt_sdt.returnTable(skill_data)```
+# Solve the IRT model and perform SDT analysis
+results = solve_IRT_for_matrix(table, FOUR_PL=True)
 
-```#Returns an object containing IRT and SDT estimated parameters. ```
+# Access the results
+print(results.thetas)  # Participant ability estimates
+print(results.est_params)  # Item parameter estimates
+print(results.sdt_results)  # SDT analysis results
 
-```results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)```
+# Plot parameter convergence
+results.plot_parameter_convergence()
 
-```#Returns a pandas dataframe of the results. Optionally, writes out a csv (set no_csv_export=False to turn this off). ```
+# Export results to CSV
+results.export_to_csv('irt_sdt_results.csv')
+```
 
-```df = pyirt_sdt.export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
+## Data Format
 
+Your input CSV should have the following columns:
+- `participant_id`: Unique identifier for each participant
+- `item_id`: Unique identifier for each item or question
+- `response`: The participant's response or score for the item
 
-  Some examples of the estimated IRT parameters and SDT parameters found in the results object (and dataframe). In addition to below, aggregate performance data across students and items are also included.
-  
-  ```results.question_ids                   # item label found in table.columns```
-  
-  '''# IRT estimated parameters '''
-  
-  ```results.thetas = all_thetas            # estimated abilities of all students```
-
-  ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
-
-            
-  '''# SDT estimated parameters '''
-  
-  ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
-
-
-  Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
-
-  
 ## Motivation: ## 
 At the time when I developed this, there was no Python IRT library that could (1) handle sparse data, and (2) run on my system without errors. 
 This library was primarily developed to generate IRT parameters from student performance data, to be used as input parameters (in addition to other primary data) for large predictive models on future student performance and to serve as an automated QA tool for generation of practice questions. It was expanded to try to include more engineered features (SDT parameters, modelling error, etc), as well, as some validation tools to confirm our approach.
@@ -105,42 +102,38 @@ cd pyirt-sdt
 pip install -e .
 ```
 
-## Quick Start
 
-Here's a simple example of how to use PyIRT_SDT:
+## Additional information on use in jupyter notebooks
 
-```python
-import pandas as pd
-from pyirt_sdt import returnTable, solve_IRT_for_matrix
+```!pip install PyIRT_SDT
+import PyIRT_SDT as pyirt_sdt
+# Returns tabular data from an array of performance data ['participant_id', 'item_id', 'response'] 
+table = pyirt_sdt.returnTable(skill_data)
+# Returns an object containing IRT and SDT estimated parameters. 
+results = pyirt_sdt.solve_IRT_for_matrix(table, FOUR_PL=True, iterations=250, verbose=False)
+# Returns a pandas dataframe of the results. Optionally, writes out a csv (set no_csv_export=False to turn this off). 
+df = pyirt_sdt.export_object_to_csv(results, skill_id, filename='estimatedItemParameters.csv', version='1.0')```
 
-# Load your data
-df = pd.read_csv('your_data.csv')
 
-# Prepare the data
-table = returnTable(df)
+  Some examples of the estimated IRT parameters and SDT parameters found in the results object (and dataframe). In addition to below, aggregate performance data across students and items are also included.
+  
+  ```results.question_ids                   # item label found in table.columns```
+  
+  '''# IRT estimated parameters '''
+  
+  ```results.thetas = all_thetas            # estimated abilities of all students```
 
-# Solve the IRT model and perform SDT analysis
-results = solve_IRT_for_matrix(table, FOUR_PL=True)
+  ```results.est_params = all_est_params    # four arrays, each containing estimated parameters (alpha, beta, etc) for 3PL/4PL IRT model, plus an additional error parameter ```
 
-# Access the results
-print(results.thetas)  # Participant ability estimates
-print(results.est_params)  # Item parameter estimates
-print(results.sdt_results)  # SDT analysis results
+            
+  '''# SDT estimated parameters '''
+  
+  ```results.auc_roc, results.optimal_threshold, results.tpr, results.tnr```
 
-# Plot parameter convergence
-results.plot_parameter_convergence()
 
-# Export results to CSV
-results.export_to_csv('irt_sdt_results.csv')
-```
+  Refer to "Local Tests.ipynb" in "Test" folder for a full example of most of the functionality, with simulated data.
 
-## Data Format
-
-Your input CSV should have the following columns:
-- `participant_id`: Unique identifier for each participant
-- `item_id`: Unique identifier for each item or question
-- `response`: The participant's response or score for the item
-
+  
 ## Documentation
 
 For detailed documentation, please refer to the [docs](docs/) directory or visit our [Read the Docs](https://pyirt-sdt.readthedocs.io/) page.
